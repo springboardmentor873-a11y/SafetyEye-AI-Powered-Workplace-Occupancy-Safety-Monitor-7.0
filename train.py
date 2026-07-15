@@ -1,20 +1,21 @@
 from ultralytics import YOLO
 
-def main():
+# Load YOLOv8 Small model
+model = YOLO("yolov8s.pt")
 
-    print("Loading extra-large base model...")
-    model = YOLO('yolov8s.pt') 
+# Train model
+results = model.train(
+    data="ppe_data.yaml",
+    epochs=95,
+    imgsz=768,
+    batch=4
+)
 
-    print("Starting training process...")
-    results = model.train(
-        data='datasets/data.yaml',    
-        epochs=30,                                           
-        imgsz=640,                                     
-        batch=16,                                      
-        name='ppe_detection_model_super'  
-    )
-    
-    print("Training complete! Check the 'runs/detect/ppe_detection_model_super' folder for results.")
+# Validate model
+metrics = model.val()
 
-if __name__ == '__main__':
-    main()
+print("\n===== Evaluation Metrics =====")
+print("mAP50:", metrics.box.map50)
+print("mAP50-95:", metrics.box.map)
+print("Precision:", metrics.box.mp)
+print("Recall:", metrics.box.mr)
