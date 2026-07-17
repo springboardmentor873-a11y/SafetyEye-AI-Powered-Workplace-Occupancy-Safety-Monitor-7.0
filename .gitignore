@@ -1,0 +1,48 @@
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ── Environment ───────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Model weights ─────────────────────────────────────────────────────────
+model/weights/last.pt
+model/weights/best.pt
+model/weights/best.onnx
+
+# ── Output data ───────────────────────────────────────────────────────────
+frames/
+sample_video.mp4
+sample_images/
+
+# ── Frontend ──────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+
+# ── Docker ────────────────────────────────────────────────────────────────
+# keep docker-compose files and Dockerfile
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──────────────────────────────────────────────────────────────────
+*.log
+logs/

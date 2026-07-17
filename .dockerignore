@@ -1,0 +1,18 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+frames/
+sample_video.mp4
+sample_images/
+grafana/
+*.md
+.git/
+.gitignore
+grafana_dashboard.json
+test_api.py
+# Exclude PyTorch weights — only the exported ONNX model is needed
+model/weights/last.pt
+frontend/node_modules/
+frontend/dist/

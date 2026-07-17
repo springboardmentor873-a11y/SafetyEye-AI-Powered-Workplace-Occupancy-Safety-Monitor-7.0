@@ -1,0 +1,74 @@
+version: "3.8"
+
+# Zero-setup deployment from Docker Hub.
+# Usage:
+#   docker-compose -f docker-compose.hub.yml up
+#
+# Prerequisites:  docker, docker-compose — nothing else.
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: safety_eye_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-safety_eye}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-safety_eye}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: safety_eye_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-Admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-MyStrongPass123}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/safety_eye.json
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      DB_PASSWORD: ${DB_PASSWORD:-123}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "${GRAFANA_PORT:-3100}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    image: amalsalilan/safety-eye:latest
+    container_name: safety_eye_api
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-safety_eye}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-123}
+      FRAME_SAMPLE_INTERVAL: ${FRAME_SAMPLE_INTERVAL:-30}
+      FRAMES_OUTPUT_DIR: /app/frames
+    volumes:
+      - ./frames:/app/frames
+    ports:
+      - "${API_PORT:-8100}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  grafana_data:
