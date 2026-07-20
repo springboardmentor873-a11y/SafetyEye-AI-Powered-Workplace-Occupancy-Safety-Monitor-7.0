@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s 
+
+scrape_configs:
+  - job_name: 'python-app'
+    static_configs:
+      - targets: ['safetyeye_api:8001'] # <-- Changed from 8000 to 8001
